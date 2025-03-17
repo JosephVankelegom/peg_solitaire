@@ -60,6 +60,6 @@ def number_of_moves(node):
     return len(node.get_all_moves())
 
 
-
+#test
 if __name__ == "__main__":
     play()
