@@ -3,20 +3,21 @@ from copy import deepcopy
 import peg_solitaire as ps
 
 def play_turn(ia, game, game_ui, root):
-    if game.is_game_over():
-        print("Game Over!")
-        return
-
-    try:
-        x1, y1, x2, y2 = ia.get_move(game)
-        if game.move(x1, y1, x2, y2):
-            print("move:", x1, y1, "->", x2, y2)
-            game_ui.update_ui()  # Update the GUI
-            root.after(500, lambda: play_turn(ia, game, game_ui, root))  # Schedule next move
-        else:
-            print("Invalid move.")
-    except ValueError:
-        print("Invalid input. Please enter four integers.")
+    while not game.is_game_over():
+        try:
+            x1, y1, x2, y2 = ia.get_move(game)
+            if game.move(x1, y1, x2, y2):
+                print("move:", x1, y1, "->", x2, y2)
+                game_ui.move(x1, y1)  # Update the GUI
+                root.update()
+                time.sleep(0.5)
+                game_ui.move(x2, y2)
+                root.update()
+            else:
+                print("Invalid move.")
+        except ValueError:
+            print("Invalid input. Please enter four integers.")
+    print("game Over")
 
 
 class MinMax_Solo:
@@ -33,6 +34,14 @@ class MinMax_Solo:
             all_moves[move] = value
             if best_value < value : result = move
         return result
+
+
+#test1
+if __name__ == "__main__":
+    root = ps.tk.Tk()
+    game_gui = ps.SolitaireGUI(root)
+    ia = MinMax_Solo(5, number_of_moves)
+    play_turn(ia, ps.Solitaire(), game_gui, root)
 
 
 
@@ -60,10 +69,7 @@ def number_of_moves(node):
     return len(node.get_all_moves())
 
 
-#test1
-if __name__ == "__main__":
-    root = ps.tk.Tk()
-    game_gui = ps.SolitaireGUI(root)
-    ia = MinMax_Solo(5, number_of_moves)
-    play_turn(ia, ps.Solitaire(), game_gui, root)
-    root.mainloop()
+
+
+
+
