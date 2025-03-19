@@ -65,7 +65,6 @@ class Solitaire:
                             moves.append((x, y, x + dx, y+dy))
         return moves
 
-
 class SolitaireGUI:
     width = 550
     height = 550
@@ -147,6 +146,8 @@ class SolitaireGUI:
         """Triggers a GUI update."""
         self.draw_pegs()
         self.root.update_idletasks()  # Ensures immediate UI refresh
+
+
 
 def play():
     game = Solitaire()

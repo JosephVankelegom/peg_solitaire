@@ -32,16 +32,14 @@ class MinMax_Solo:
             next_node = node.successor(move)
             value = heuristc_search(next_node, self.depth - 1, self.eval_fun)
             all_moves[move] = value
-            if best_value < value : result = move
+            if best_value < value :
+                result = move
+                best_value = value
         return result
 
 
 #test1
-if __name__ == "__main__":
-    root = ps.tk.Tk()
-    game_gui = ps.SolitaireGUI(root)
-    ia = MinMax_Solo(5, number_of_moves)
-    play_turn(ia, ps.Solitaire(), game_gui, root)
+
 
 
 
@@ -68,8 +66,37 @@ def heuristc_search(node, depth, eval_fun):
 def number_of_moves(node):
     return len(node.get_all_moves())
 
+def pieces_center(node):
+    pegs = 0
+    pegs_c = 0
+    pegs_t = 0
+    def touching(x, y):
+        for x_t in [x-1,x,x+1]:
+            for y_t in [y-1,y,y+1]:
+                if (x_t != x or y_t != y) and (0<=x_t<=6 and 0<=y_t<=6) and node.board[y_t, x_t] == 1:
+                    return True
+        return False
+
+    for y in range(7):
+        for x in range(7):
+            if node.board[y, x] == 1:
+                pegs += 1
+                if touching(x,y):
+                    pegs_t += 1
+                if 2<= x <= 4 and 2 <= y <= 4:
+                    pegs_c += 1
+
+    result = 500 + pegs_c + pegs_t + len(node.get_all_moves()) - (pegs * 10)
+    if pegs == 1:
+        result = float("inf")
+    return result
 
 
 
 
 
+if __name__ == "__main__":
+    root = ps.tk.Tk()
+    game_gui = ps.SolitaireGUI(root)
+    ia = MinMax_Solo(5, pieces_center)
+    play_turn(ia, ps.Solitaire(), game_gui, root)
