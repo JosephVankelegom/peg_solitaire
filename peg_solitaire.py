@@ -1,3 +1,5 @@
+import copy
+
 import numpy as np
 import tkinter as tk
 from tkinter import messagebox
@@ -39,6 +41,11 @@ class Solitaire:
             self.board[y_mp, x_mp] = 0
             return True
         return False
+
+    def successor(self, pos):
+        suc = copy.deepcopy(self)
+        suc.move(*pos)
+        return suc
 
     def is_game_over(self):
         for y in range(7):
@@ -107,13 +114,19 @@ class SolitaireGUI:
                     peg_color = "red" if self.selected == (x, y) else "saddlebrown"
                     self.canvas.create_oval(x1 + self.peg_radius, y1 + self.peg_radius, x1 - self.peg_radius, y1 - self.peg_radius, fill=peg_color, tags="pegs")
 
-
+    def successor(self, pos):
+        suc = copy.deepcopy(self.game)
+        suc.move(*pos)
+        return suc
 
     def on_click(self, event):
         cell_size = 50
         x = round((event.x - self.center_x) / cell_size) + 3
         y = round((event.y - self.center_y) / cell_size) + 3
+        self.move(x, y)
 
+
+    def move(self, x, y):
         if self.selected is None:
             if self.game.board[y, x] == 1:
                 self.selected = (x, y)
@@ -130,6 +143,10 @@ class SolitaireGUI:
             self.draw_pegs()
             if self.game.is_game_over():
                 messagebox.showinfo("Game Over", "No more moves available!")
+    def update_ui(self):
+        """Triggers a GUI update."""
+        self.draw_pegs()
+        self.root.update_idletasks()  # Ensures immediate UI refresh
 
 def play():
     game = Solitaire()
