@@ -17,6 +17,7 @@ class Solitaire:
             [-1, -1, 1, 1, 1, -1, -1],
             [-1, -1, 1, 1, 1, -1, -1]
         ])
+        self.number_of_pegs = np.count_nonzero(self.board == 1)
 
     def display(self):
         print("  0 1 2 3 4 5 6")
@@ -39,6 +40,7 @@ class Solitaire:
             self.board[y1, x1] = 0
             self.board[y2, x2] = 1
             self.board[y_mp, x_mp] = 0
+            self.number_of_pegs -= 1
             return True
         return False
 
@@ -64,7 +66,6 @@ class Solitaire:
                         if 0 <= x + dx < 7 and 0 <= y + dy < 7 and self.is_valid_move(x, y, x + dx, y + dy):
                             moves.append((x, y, x + dx, y+dy))
         return moves
-
 
 class SolitaireGUI:
     width = 550
@@ -147,6 +148,8 @@ class SolitaireGUI:
         """Triggers a GUI update."""
         self.draw_pegs()
         self.root.update_idletasks()  # Ensures immediate UI refresh
+
+
 
 def play():
     game = Solitaire()
