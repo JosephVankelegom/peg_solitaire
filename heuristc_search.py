@@ -157,7 +157,6 @@ if __name__ == "__uirun__":
 
 if __name__ == "__main__":
     path = play(Depth_First_Search, ps.Solitaire())
-    print(path)
 
     root = ps.tk.Tk()
     game_gui = ps.SolitaireGUI(root)
