@@ -126,7 +126,7 @@ def pieces_center(node):
     return result
 
 def stop_of_pieces(node, bests_path):
-    return len(bests_path) == 100
+    return len(bests_path) == 5
 
 def number_of_pieces(node):
     return 101 - node.number_of_pegs
@@ -156,10 +156,12 @@ if __name__ == "__uirun__":
 
 
 if __name__ == "__main__":
-    path = play(Depth_First_Search, ps.Solitaire())
+    paths = play(Depth_First_Search, ps.Solitaire())
 
-    root = ps.tk.Tk()
-    game_gui = ps.SolitaireGUI(root)
-    #ia = PreprocessPath(path)
-    #play_turn_ui(ia, ps.Solitaire(), game_gui, root)
+    for path in paths:
+        root = ps.tk.Tk()
+        game_gui = ps.SolitaireGUI(root)
+        ia = PreprocessPath(path)
+        play_turn_ui(ia, ps.Solitaire(), game_gui, root)
     root.mainloop()
+
