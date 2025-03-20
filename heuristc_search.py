@@ -2,7 +2,7 @@ import time
 from copy import deepcopy
 import peg_solitaire as ps
 
-def play_turn(ia, game, game_ui, root):
+def play_turn_ui(ia, game, game_ui, root):
     while not game.is_game_over():
         try:
             x1, y1, x2, y2 = ia.get_move(game)
@@ -18,6 +18,10 @@ def play_turn(ia, game, game_ui, root):
         except ValueError:
             print("Invalid input. Please enter four integers.")
     print("game Over")
+
+
+def play(ia, game):
+    return ia(game, number_of_pieces )
 
 
 class MinMax_Solo:
@@ -60,6 +64,41 @@ def heuristc_search(node, depth, eval_fun):
     return value
 
 
+def Depth_First_Search(node_o, eval_function):
+
+    def Depth_First_Search_int(node, path, eval_fun):
+        best_val = float("-inf")
+        best_path = []
+        all_moves = node.get_all_moves()
+        if len(all_moves) == 0:
+            val = eval_fun(node)
+            print("val : ", val)
+            return val, path
+        for move in all_moves:
+            if best_val == 100:
+                return best_val, best_path
+            new_path = deepcopy(path)
+            new_path.append(move)
+            val_val, new_new_path = Depth_First_Search_int(node.successor(move), new_path  , eval_fun)
+            if val_val > best_val:
+                best_val = val_val
+                best_path = new_new_path
+        return best_val, best_path
+
+    valval, pathpath = Depth_First_Search_int(node_o, [], eval_function)
+    print("best_val : ", valval,"\npath : ", pathpath)
+    return valval, pathpath
+
+class PreprocessPath:
+
+    def __init__(self, pathway):
+        self.path = pathway
+    def get_move(self, node):
+        return self.path.pop(0)
+
+
+
+
 ###########
 #  Eval   #
 ###########
@@ -91,12 +130,27 @@ def pieces_center(node):
         result = float("inf")
     return result
 
+def number_of_pieces(node):
+    return 101 - node.number_of_pegs
 
 
 
 
-if __name__ == "__main__":
+
+
+
+if __name__ == "__uirun__":
     root = ps.tk.Tk()
     game_gui = ps.SolitaireGUI(root)
     ia = MinMax_Solo(5, pieces_center)
-    play_turn(ia, ps.Solitaire(), game_gui, root)
+    play_turn_ui(ia, ps.Solitaire(), game_gui, root)
+
+
+if __name__ == "__main__":
+    val , path = play(Depth_First_Search, ps.Solitaire())
+    print(len(path))
+
+    root = ps.tk.Tk()
+    game_gui = ps.SolitaireGUI(root)
+    ia = PreprocessPath(path)
+    play_turn_ui(ia, ps.Solitaire(), game_gui, root)

@@ -17,6 +17,7 @@ class Solitaire:
             [-1, -1, 1, 1, 1, -1, -1],
             [-1, -1, 1, 1, 1, -1, -1]
         ])
+        self.number_of_pegs = np.count_nonzero(self.board == 1)
 
     def display(self):
         print("  0 1 2 3 4 5 6")
@@ -39,6 +40,7 @@ class Solitaire:
             self.board[y1, x1] = 0
             self.board[y2, x2] = 1
             self.board[y_mp, x_mp] = 0
+            self.number_of_pegs -= 1
             return True
         return False
 
