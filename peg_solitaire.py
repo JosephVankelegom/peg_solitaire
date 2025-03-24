@@ -24,7 +24,8 @@ class Solitaire:
         for i, row in enumerate(self.board):
             print(i, " ".join(['.' if cell == -1 else 'O' if cell == 1 else ' ' for cell in row]))
 
-    def is_valid_move(self, x1, y1, x2, y2):
+    def is_valid_move(self, pos):
+        x1, y1, x2, y2 = pos
         x_mp = int((x1 + x2)/2)
         y_mp = int((y1 + y2)/2)
         if self.board[y1, x1] != 1 or self.board[y2, x2] != 0 or self.board[y_mp, x_mp] != 1:
@@ -33,10 +34,11 @@ class Solitaire:
             return False
         return True
 
-    def move(self, x1, y1, x2, y2):
+    def move(self, pos):
+        x1, y1, x2, y2 = pos
         x_mp = int((x1 + x2)/2)
         y_mp = int((y1 + y2)/2)
-        if self.is_valid_move(x1, y1, x2, y2):
+        if self.is_valid_move(pos):
             self.board[y1, x1] = 0
             self.board[y2, x2] = 1
             self.board[y_mp, x_mp] = 0
@@ -46,7 +48,7 @@ class Solitaire:
 
     def successor(self, pos):
         suc = copy.deepcopy(self)
-        suc.move(*pos)
+        suc.move(pos)
         return suc
 
     def is_game_over(self):
@@ -54,7 +56,7 @@ class Solitaire:
             for x in range(7):
                 if self.board[y, x] == 1:
                     for dx, dy in [(2, 0), (-2, 0), (0, 2), (0, -2)]:
-                        if 0 <= x + dx < 7 and 0 <= y + dy < 7 and self.is_valid_move(x, y, x + dx, y + dy):
+                        if 0 <= x + dx < 7 and 0 <= y + dy < 7 and self.is_valid_move((x, y, x + dx, y + dy)):
                             return False
         return True
     def get_all_moves(self):
@@ -63,7 +65,7 @@ class Solitaire:
             for x in range(7):
                 if self.board[y, x] == 1:
                     for dx, dy in [(2, 0), (-2, 0), (0, 2), (0, -2)]:
-                        if 0 <= x + dx < 7 and 0 <= y + dy < 7 and self.is_valid_move(x, y, x + dx, y + dy):
+                        if 0 <= x + dx < 7 and 0 <= y + dy < 7 and self.is_valid_move((x, y, x + dx, y + dy)):
                             moves.append((x, y, x + dx, y+dy))
         return moves
 
@@ -117,7 +119,7 @@ class SolitaireGUI:
 
     def successor(self, pos):
         suc = copy.deepcopy(self.game)
-        suc.move(*pos)
+        suc.move(pos)
         return suc
 
     def on_click(self, event):
@@ -136,7 +138,7 @@ class SolitaireGUI:
             x1, y1 = self.selected
             if x1 == x and y1 == y:
                 self.selected = None
-            elif not self.game.move(x1, y1, x, y):
+            elif not self.game.move((x1, y1, x, y)):
                 print("Invalid move. Try again.")
                 print(self.game.board)
                 print(self.game.get_all_moves())
@@ -158,7 +160,7 @@ def play():
         try:
             print(game.get_all_moves())
             x1, y1, x2, y2 = map(int, input("Enter move (x1 y1 x2 y2): ").split())
-            if not game.move(x1, y1, x2, y2):
+            if not game.move((x1, y1, x2, y2)):
                 print("Invalid move. Try again.")
         except ValueError:
             print("Invalid input. Please enter four integers.")
