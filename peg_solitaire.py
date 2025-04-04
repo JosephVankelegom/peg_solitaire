@@ -6,9 +6,8 @@ from tkinter import messagebox
 
 
 class Solitaire:
-    def __init__(self):
-        # 7x7 board with -1 as invalid spaces, 1 as pegs, and 0 as empty
-        self.board = np.array([
+    def __init__(self,
+        board = np.array([
             [-1, -1, 1, 1, 1, -1, -1],
             [-1, -1, 1, 1, 1, -1, -1],
             [1, 1, 1, 1, 1, 1, 1],
@@ -16,7 +15,9 @@ class Solitaire:
             [1, 1, 1, 1, 1, 1, 1],
             [-1, -1, 1, 1, 1, -1, -1],
             [-1, -1, 1, 1, 1, -1, -1]
-        ])
+        ])):
+        # 7x7 board with -1 as invalid spaces, 1 as pegs, and 0 as empty
+        self.board = board
         self.number_of_pegs = np.count_nonzero(self.board == 1)
 
     def display(self):
