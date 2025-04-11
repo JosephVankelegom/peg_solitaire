@@ -14,10 +14,10 @@ def resize_and_show(title, image, scale=0.2):
 def preprocess_image(image_path):
     """Loads and preprocesses the image for peg detection."""
     image = cv2.imread(image_path, cv2.IMREAD_GRAYSCALE)
-    #resize_and_show("Original Image", image)
+    resize_and_show("Original Image", image)
 
     blurred = cv2.GaussianBlur(image, (5, 5), 0)
-    #resize_and_show("Blurred Image", blurred)
+    resize_and_show("Blurred Image", blurred)
 
     _, thresh = cv2.threshold(blurred, 100, 255, cv2.THRESH_BINARY_INV)
     resize_and_show("Thresholded Image", thresh)
@@ -32,28 +32,45 @@ def preprocess_image(image_path):
 
     # Detect circles using Hough Transform
     circles = cv2.HoughCircles(dilation_img, cv2.HOUGH_GRADIENT, dp=1.2, minDist=100,
-                               param1=50, param2=30, minRadius=100, maxRadius=2000)
+                               param1=50, param2=30, minRadius=1000, maxRadius=2000)
     if circles is not None:
         circles = np.uint16(np.around(circles))
-        x, y, r = circles[0][0]  # Take the first (largest) detected circle
-
-        # Create a mask to extract only the circle
-        mask = np.zeros_like(image)
-        cv2.circle(mask, (x, y), r, 255, thickness=-1)
-
-        # Apply mask
-        cropped_circle = cv2.bitwise_and(image, image, mask=mask)
-
-        # Extract only the bounding box around the detected circle
-        x1, y1, x2, y2 = x - r, y - r, x + r, y + r
-        cropped_image = cropped_circle[y1:y2, x1:x2]
-
-        # Save & Show cropped image
-        resize_and_show("Cropped Circle", cropped_image)
-        cv2.waitKey(0)
-        cv2.destroyAllWindows()
     else:
-        print("No circles detected.")
+        print("No board detected.")
+        return None
+    x, y, r = circles[0][0]  # Take the first (largest) detected circle
+
+    # Create a mask to extract only the circle
+    mask = np.zeros_like(image)
+    cv2.circle(mask, (x, y), r - 10, 255, thickness=-1)
+
+    # Apply mask
+    cropped_circle = cv2.bitwise_and(dilation_img, dilation_img, mask=mask)
+
+    # Save & Show cropped image
+    resize_and_show("Cropped Circle", cropped_circle)
+
+    print("start detecting peg possitions")
+    # Detect circles using Hough Transform
+    circles = cv2.HoughCircles(cropped_circle, cv2.HOUGH_GRADIENT, dp=1.5, minDist=100, param1=50, param2=20, minRadius=70, maxRadius=150)
+
+    board = np.full((7, 7), -1)  # Initialize board with -1 (invalid spaces)
+
+    print("start printing peg possitions")
+    if circles is not None:
+        circles = np.uint16(np.around(circles))
+        print(circles)
+        output_image = image
+        max_circles = 0
+        for x, y, r in circles[0, :]:
+            if max_circles == 50:
+                break
+            max_circles+=1
+            cv2.circle(output_image, (x, y), r, (0, 255, 0), 2)
+        resize_and_show("Detected Pegs", output_image)
+    else:
+        print("error")
+
 
 
 
