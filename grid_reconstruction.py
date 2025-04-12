@@ -8,19 +8,16 @@ def grid_reconstruction(lines):
         return result
     
     def get_pos(gr, li):
-        for x in range(grid):
-            if inside: break
-            for y in range(grid):
-                if inside: break
-                for i in range(line):
-                    if inside: break
-                    if np.array_equals(grid[y][x],line[i]):
+        for x in range(len(gr)):
+            for y in range(len(gr)):
+                for i in range(len(li)):
+                    if is_equals(grid[y][x],line[i]):
                         return True, [x,y,i]
         return False, []
     
     def empty_row(row):
         for x in row:
-            if not np.array_equals(x,np.array([-1])):
+            if not is_empty(x):
                 return False
         return True
     
@@ -50,18 +47,18 @@ def grid_reconstruction(lines):
         returned_line = []
         if horizontal:
             if pos_g[0] < pos_l:
-                move_line_grid(grid, grid_filled, posg[0], pos_l, False)
+                move_line_grid(grid, grid_filled, pos_g[0], pos_l, False)
                 new_pos_g[0] = pos_l
         else:
             if pos_g[1] < pos_l:
-                move_line_grid(grid, posg[1], pos_l, True)
+                move_line_grid(grid, pos_g[1], pos_l, True)
                 new_pos_g[1] = pos_l
                 
         for pos, val in enumerate(line):
             if horizontal:
-                pos_grid = [new_pos_g[0] ,pos_cal + new_pos_g[1]]
+                pos_grid = [new_pos_g[0] ,pos -pos_l + new_pos_g[1]]
             else:
-                pos_grid = [pos_cal + new_pos_g[0], new_pos_g[1]]
+                pos_grid = [pos -pos_l + new_pos_g[0], new_pos_g[1]]
                 
             if not is_empty(grid[new_pos_g[0], new_pos_g[1]]):
                 if horizontal:
@@ -73,6 +70,8 @@ def grid_reconstruction(lines):
         
     def is_empty(val):
         return val == empty
+    def is_equals(val1, val2):
+        return val1 == val2
     
     def empty_line(grid, grid_filled, index, is_row):
         returned_line = []
