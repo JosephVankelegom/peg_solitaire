@@ -41,7 +41,7 @@ def grid_reconstruction(lines):
             grid_filled[1].add(index_stop)
         return remplaced_line
 
-    
+
     def fill_grid(grid, grid_filled, line, pos_g, pos_l, horizontal):
         new_pos_g = pos_g
         returned_line = []
@@ -60,16 +60,16 @@ def grid_reconstruction(lines):
             else:
                 pos_grid = [pos -pos_l + new_pos_g[0], new_pos_g[1]]
                 
-            if not is_empty(grid[new_pos_g[0], new_pos_g[1]]):
+            if not is_empty(grid[pos_grid[0]][pos_grid[1]]):
                 if horizontal:
-                    returned_line.append(empty_line(grid, grid_filled, grid[new_pos_g[0]], False ))
+                    returned_line.append(empty_line(grid, grid_filled, pos_grid[0], False ))
                 else:
-                    returned_line.append(empty_line(grid, grid_filled, grid[new_pos_g[1]], True ))
-            grid[new_pos_g[0], new_pos_g[1]] = val
+                    returned_line.append(empty_line(grid, grid_filled, pos_grid[1], True ))
+            grid[pos_grid[0]][pos_grid[1]] = val
         return returned_line
         
     def is_empty(val):
-        return val == empty
+        return val == [empty]
     def is_equals(val1, val2):
         return val1 == val2
     
@@ -95,7 +95,7 @@ def grid_reconstruction(lines):
     emptyness = [-1]
     maxleng= max_len(lines)
     grid = [[emptyness for _ in range(maxleng)] for _ in range(maxleng)]
-    grid_filled = [{},{}] # row and then col
+    grid_filled = [set({}),set({})] # row and then col
     ret_lines = []
     
     for line in lines:
