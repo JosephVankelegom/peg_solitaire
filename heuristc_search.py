@@ -6,8 +6,7 @@ def play_turn_ui(ia, game, game_ui, root):
     while not game.is_game_over():
         try:
             x1, y1, x2, y2 = ia.get_move(game)
-            if game.move(x1, y1, x2, y2):
-                print("move:", x1, y1, "->", x2, y2)
+            if game.move((x1, y1, x2, y2)):
                 game_ui.move(x1, y1)  # Update the GUI
                 root.update()
                 time.sleep(0.5)
@@ -20,8 +19,8 @@ def play_turn_ui(ia, game, game_ui, root):
     print("game Over")
 
 
-def play(ia, game):
-    return ia(game, number_of_pieces )
+def play(ia, game, args):
+    return ia(game, args)
 
 
 class MinMax_Solo:
@@ -64,30 +63,56 @@ def heuristc_search(node, depth, eval_fun):
     return value
 
 
-def Depth_First_Search(node_o, eval_function):
-
-    def Depth_First_Search_int(node, path, eval_fun):
-        best_val = float("-inf")
-        best_path = []
+def Depth_First_Search(node_o, args_dfs):
+    if len(args_dfs) != 5 :
+        "wrong number of args, should be: result, eval_function, args_eval, stop_function, args_stop"
+        return []
+    result, eval_function, args_eval, stop_function, args_stop = args_dfs
+    @count_explored  # Application du décorateur
+    def Depth_First_Search_int(node, path, bests_paths, eval_fun, stop_fun):
         all_moves = node.get_all_moves()
         if len(all_moves) == 0:
-            val = eval_fun(node)
-            print("val : ", val)
-            return val, path
+            val = eval_fun(node, args_eval)
+            if val == 100:
+                bests_paths.extend([path])
+            return
         for move in all_moves:
-            if best_val == 100:
-                return best_val, best_path
+            if stop_fun(node, args_stop):
+                return
             new_path = deepcopy(path)
             new_path.append(move)
-            val_val, new_new_path = Depth_First_Search_int(node.successor(move), new_path  , eval_fun)
-            if val_val > best_val:
-                best_val = val_val
-                best_path = new_new_path
-        return best_val, best_path
+            Depth_First_Search_int(node.successor(move), new_path, bests_paths, eval_fun, stop_fun)
+        return
+    Depth_First_Search_int(node_o, [], result, eval_function, stop_function)
+    print("Nombre de nœuds explorés DFS:", Depth_First_Search_int.counter)
+    return result
 
-    valval, pathpath = Depth_First_Search_int(node_o, [], eval_function)
-    print("best_val : ", valval,"\npath : ", pathpath)
-    return valval, pathpath
+
+def Breadth_First_Search(node_o, args_bfs):
+    if len(args_bfs) != 6 :
+        "wrong number of args, should be: result, eval_function, args_eval, stop_function, args_stop"
+        return []
+    result, all_nodes, eval_function, args_eval, stop_function, args_stop = args_bfs
+
+    @count_explored  # Application du décorateur
+    def Breadth_First_Search_int(node, all_n, path, bests_paths, eval_fun, stop_fun):
+        if stop_fun(node, args_stop):
+            return
+        all_moves = node.get_all_moves()
+        if len(all_moves) == 0:
+            val = eval_fun(node, args_eval)
+            if val == 100:
+                bests_paths.extend([path])
+            return
+        for move in all_moves:
+            new_path = deepcopy(path)
+            new_path.append(move)
+            all_n.append(node.successor(move))
+        Breadth_First_Search_int(all_n.pop(0), new_path, bests_paths, eval_fun, stop_fun)
+        return
+    Breadth_First_Search_int(node_o, all_nodes, [], result, eval_function, stop_function)
+    print("Nombre de nœuds explorés DFS:", Breadth_First_Search_int.counter)
+    return result
 
 class PreprocessPath:
 
@@ -102,7 +127,7 @@ class PreprocessPath:
 ###########
 #  Eval   #
 ###########
-def number_of_moves(node):
+def number_of_moves(node, args_eval):
     return len(node.get_all_moves())
 
 def pieces_center(node):
@@ -130,10 +155,25 @@ def pieces_center(node):
         result = float("inf")
     return result
 
-def number_of_pieces(node):
+def stop_of_pieces(node, args):
+    bests_path, depth = args
+    return len(bests_path) == depth
+
+def number_of_pieces(node, args_eval):
     return 101 - node.number_of_pegs
 
 
+
+#################
+#   Stats       #
+#################
+
+def count_explored(func):
+    def wrapper(*args, **kwargs):
+        wrapper.counter += 1
+        return func(*args, **kwargs)
+    wrapper.counter = 0
+    return wrapper
 
 
 
@@ -147,10 +187,19 @@ if __name__ == "__uirun__":
 
 
 if __name__ == "__main__":
-    val , path = play(Depth_First_Search, ps.Solitaire())
-    print(len(path))
+    ui = False
+    paths = []
+    game = ps.Solitaire()
+    all_nodes = [game]
+    args = (paths, number_of_pieces, (), stop_of_pieces, (paths, 100))
+    play(Breadth_First_Search, game, args)
+    print(paths)
 
-    root = ps.tk.Tk()
-    game_gui = ps.SolitaireGUI(root)
-    ia = PreprocessPath(path)
-    play_turn_ui(ia, ps.Solitaire(), game_gui, root)
+    if ui :
+        for path in paths:
+            root = ps.tk.Tk()
+            game_gui = ps.SolitaireGUI(root)
+            ia = PreprocessPath(path)
+            play_turn_ui(ia, ps.Solitaire(), game_gui, root)
+        root.mainloop()
+
