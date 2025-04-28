@@ -50,16 +50,13 @@ def preprocess_image(image_path):
     # Save & Show cropped image
     resize_and_show("Cropped Circle", cropped_circle)
 
-    print("start detecting peg possitions")
     # Detect circles using Hough Transform
     circles = cv2.HoughCircles(cropped_circle, cv2.HOUGH_GRADIENT, dp=1.5, minDist=100, param1=50, param2=20, minRadius=70, maxRadius=150)
 
     board = np.full((7, 7), -1)  # Initialize board with -1 (invalid spaces)
 
-    print("start printing peg possitions")
     if circles is not None:
         circles = np.uint16(np.around(circles))
-        print(circles)
         output_image = image
         max_circles = 0
         for x, y, r in circles[0, :]:
@@ -70,15 +67,7 @@ def preprocess_image(image_path):
         resize_and_show("Detected Pegs", output_image)
     else:
         print("error")
-
-
-
-
-
-
-
-
-    return thresh
+    return thresh, circles
 
 def erosion_image(image, kernel):
     img_erosion = cv2.erode(image, kernel, iterations=2)
@@ -91,5 +80,6 @@ def dilation_image(image, kernel):
 
 
 if __name__ == "__main__":
-    image_path = "Data/PegSolitaire002B.jpg"
-    processed_image = preprocess_image(image_path)
+    image_path = "../Data/PegSolitaire002B.jpg"
+    processed_image, circles = preprocess_image(image_path)
+
