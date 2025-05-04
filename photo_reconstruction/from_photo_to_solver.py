@@ -5,7 +5,7 @@ import grid_reconstruction
 import recreate_line
 
 def from_photo_to_solver(path):
-    processed_image, circles = photo_reco.preprocess_image(path, {"thresh_adaptive": True, "mask" : True}, show = True)
+    processed_image, circles = photo_reco.preprocess_image(path, [{"Blur": True},{ "Gray": True},{ "Thresh": True},{"Dilatation": True},{"Erosion": True},{"Mask": True},{"Circles": True}], show = True)
     circles_p = photo_reco.from_circles_to_points(circles)
     circles_p = np.array(circles_p)
     lines = recreate_line.get_lines(circles_p, 7)

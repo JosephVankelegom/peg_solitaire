@@ -187,12 +187,12 @@ if __name__ == "__uirun__":
 
 
 if __name__ == "__main__":
-    ui = False
+    ui = True
     paths = []
     game = ps.Solitaire()
     all_nodes = [game]
     args = (paths, number_of_pieces, (), stop_of_pieces, (paths, 100))
-    play(Breadth_First_Search, game, args)
+    play(Depth_First_Search, game, args)
     print(paths)
 
     if ui :
